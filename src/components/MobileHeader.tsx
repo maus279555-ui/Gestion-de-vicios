@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Navigation, Sparkles, RefreshCw, DollarSign, ShieldCheck, Database } from 'lucide-react';
+import { MapPin, Navigation, Sparkles, RefreshCw, DollarSign, ShieldCheck } from 'lucide-react';
 import { GeoLocationInfo } from '../types/finance';
 import { sound } from '../services/sound';
 import { triggerHaptic } from '../services/geolocation';
@@ -13,7 +13,6 @@ interface MobileHeaderProps {
   onLoadDemoData: () => void;
   todaySavings: number;
   hasData: boolean;
-  onOpenStudio?: () => void;
 }
 
 export const MobileHeader: React.FC<MobileHeaderProps> = ({
@@ -25,7 +24,6 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
   onLoadDemoData,
   todaySavings,
   hasData,
-  onOpenStudio,
 }) => {
   const [timeStr, setTimeStr] = useState('');
   const [dateStr, setDateStr] = useState('');
@@ -86,21 +84,6 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
 
           {/* Quick Actions (Currency + Demo data + Balance pill) */}
           <div className="flex items-center gap-1.5">
-            {onOpenStudio && (
-              <button
-                onClick={() => {
-                  triggerHaptic('light');
-                  sound.playClick();
-                  onOpenStudio();
-                }}
-                className="px-2.5 py-1 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 text-xs font-bold rounded-lg border border-emerald-500/40 flex items-center gap-1 transition-all active:scale-95 shadow-sm"
-                title="Abrir inspector Drizzle Studio"
-              >
-                <Database className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Studio</span>
-              </button>
-            )}
-
             <button
               onClick={() => {
                 triggerHaptic('light');

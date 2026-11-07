@@ -10,7 +10,6 @@ import {
   Wine,
   Beer,
   UtensilsCrossed,
-  Database,
   ShieldCheck,
   Zap,
   ArrowRight,
@@ -21,7 +20,6 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { Transaction } from '../types/finance';
-import { TursoStatus } from '../services/api';
 import { triggerHaptic } from '../services/geolocation';
 import { sound } from '../services/sound';
 import { getLocalDateString } from '../services/storage';
@@ -29,19 +27,15 @@ import { getLocalDateString } from '../services/storage';
 interface HomeOverviewViewProps {
   transactions: Transaction[];
   currency: string;
-  tursoStatus: TursoStatus | null;
   onGoToPad: (type?: 'income' | 'expense') => void;
   onGoToReports: () => void;
-  onOpenStudio?: () => void;
 }
 
 export const HomeOverviewView: React.FC<HomeOverviewViewProps> = ({
   transactions,
   currency,
-  tursoStatus,
   onGoToPad,
   onGoToReports,
-  onOpenStudio,
 }) => {
   const todayStr = getLocalDateString();
 
@@ -94,53 +88,6 @@ export const HomeOverviewView: React.FC<HomeOverviewViewProps> = ({
 
   return (
     <div className="w-full max-w-lg mx-auto pb-10 px-3 sm:px-4">
-      {/* Turso Database Badge */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-2.5 mb-3 flex items-center justify-between shadow-sm text-xs">
-        <div className="flex items-center gap-2">
-          <div
-            className={`w-7 h-7 rounded-xl flex items-center justify-center ${
-              tursoStatus?.connected
-                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-            }`}
-          >
-            <Database className="w-4 h-4" />
-          </div>
-          <div>
-            <div className="flex items-center gap-1.5 font-bold text-white text-[11px]">
-              <span>Base de Datos Turso + Drizzle</span>
-              <span
-                className={`text-[9px] px-1.5 py-0.2 rounded font-extrabold uppercase ${
-                  tursoStatus?.connected
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                    : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
-                }`}
-              >
-                {tursoStatus?.connected ? 'Conectado AWS SA-East' : 'Turso Configurado'}
-              </span>
-            </div>
-            <p className="text-[10px] text-slate-400 font-mono truncate max-w-[190px] sm:max-w-xs">
-              gestion-de-vicios-maus279555-ui.aws-sa-east-1.turso.io
-            </p>
-          </div>
-        </div>
-
-        {onOpenStudio && (
-          <button
-            onClick={() => {
-              triggerHaptic('light');
-              sound.playClick();
-              onOpenStudio();
-            }}
-            className="text-[10px] text-emerald-300 font-bold bg-emerald-950/80 hover:bg-emerald-900/80 px-2 py-1 rounded-lg border border-emerald-800/80 flex items-center gap-1 transition-all active:scale-95"
-            title="Abrir inspector Drizzle Studio"
-          >
-            <Database className="w-3 h-3 text-emerald-400" />
-            <span>Ver Tabla</span>
-          </button>
-        )}
-      </div>
-
       {/* Panorama Hero Card */}
       <div className="bg-gradient-to-br from-slate-900 via-emerald-950/30 to-slate-950 border border-emerald-500/40 rounded-3xl p-5 mb-4 shadow-xl relative overflow-hidden">
         <div className="flex items-center justify-between text-xs text-slate-400 mb-1">

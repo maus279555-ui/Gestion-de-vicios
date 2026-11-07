@@ -1,12 +1,10 @@
+import 'dotenv/config';
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
 import { db, client, initDatabase, updateTursoAuth } from './src/db/index';
 import { transactionsTable } from './src/db/schema';
 import { eq, desc } from 'drizzle-orm';
-
-dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -117,23 +115,38 @@ app.post('/api/transactions', async (req, res) => {
       return res.status(400).json({ error: 'Campos obligatorios faltantes' });
     }
 
-    await db.insert(transactionsTable).values({
-      id: t.id,
-      type: t.type,
-      category: t.category,
-      categoryName: t.categoryName,
-      amount: Number(t.amount),
-      note: t.note || null,
-      date: t.date,
-      time: t.time,
-      timestamp: Number(t.timestamp) || Date.now(),
-      latitude: t.location?.latitude || null,
-      longitude: t.location?.longitude || null,
-      accuracy: t.location?.accuracy || null,
-      locationAddress: t.location?.address || null,
-      paymentMethod: t.paymentMethod || 'efectivo',
-      createdAt: Date.now(),
-    });
+    await db
+      .insert(transactionsTable)
+      .values({
+        id: t.id,
+        type: t.type,
+        category: t.category,
+        categoryName: t.categoryName,
+        amount: Number(t.amount),
+        note: t.note || null,
+        date: t.date,
+        time: t.time,
+        timestamp: Number(t.timestamp) || Date.now(),
+        latitude: t.location?.latitude || null,
+        longitude: t.location?.longitude || null,
+        accuracy: t.location?.accuracy || null,
+        locationAddress: t.location?.address || null,
+        paymentMethod: t.paymentMethod || 'efectivo',
+        createdAt: Date.now(),
+      })
+      .onConflictDoUpdate({
+        target: transactionsTable.id,
+        set: {
+          type: t.type,
+          category: t.category,
+          categoryName: t.categoryName,
+          amount: Number(t.amount),
+          note: t.note || null,
+          date: t.date,
+          time: t.time,
+          paymentMethod: t.paymentMethod || 'efectivo',
+        },
+      });
 
     res.status(201).json({ success: true, message: 'Guardado en Turso exitosamente' });
   } catch (err: any) {

@@ -36,7 +36,6 @@ import { QuickEntryPad } from './components/QuickEntryPad';
 import { ReportView } from './components/ReportView';
 import { HistorySavingsView } from './components/HistorySavingsView';
 import { SettingsView } from './components/SettingsView';
-import { DrizzleStudioModal } from './components/DrizzleStudioModal';
 import { clearAllTursoTransactions } from './services/api';
 
 export default function App() {
@@ -48,7 +47,6 @@ export default function App() {
   const [isLocating, setIsLocating] = useState<boolean>(true);
   const [tursoStatus, setTursoStatus] = useState<TursoStatus | null>(null);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
-  const [showStudioModal, setShowStudioModal] = useState<boolean>(false);
 
   // Initialize data on mount - clean slate, NO fictitious data
   useEffect(() => {
@@ -72,8 +70,15 @@ export default function App() {
             const merged = Array.from(map.values()).sort((a, b) => b.timestamp - a.timestamp);
             setTransactions(merged);
             saveTransactions(merged);
-          } else {
-            // First time connecting with empty Turso table: push existing local records
+
+            // Sync any local transactions that Turso doesn't have yet
+            const serverIds = new Set(serverTxs.map((t) => t.id));
+            const pendingSync = cleanRealTxs.filter((t) => !serverIds.has(t.id));
+            if (pendingSync.length > 0) {
+              syncAllToTurso(pendingSync);
+            }
+          } else if (cleanRealTxs.length > 0) {
+            // Push existing local records to empty Turso table
             syncAllToTurso(cleanRealTxs);
           }
         });
@@ -174,6 +179,10 @@ export default function App() {
       const status = await checkTursoStatus();
       setTursoStatus(status);
       const count = await syncAllToTurso(transactions);
+      const serverTxs = await fetchTursoTransactions();
+      if (serverTxs) {
+        updateTransactions(serverTxs);
+      }
       alert(`Sincronización completada con Turso. Se procesaron ${count} registros.`);
     } catch (e: any) {
       alert(`Nota de sincronización: ${e?.message || 'Error al conectar'}`);
@@ -203,7 +212,6 @@ export default function App() {
         onLoadDemoData={handleLoadDemoData}
         todaySavings={todaySummary.netSavings}
         hasData={transactions.length > 0}
-        onOpenStudio={() => setShowStudioModal(true)}
       />
 
       {/* Main Content Area */}
@@ -212,10 +220,8 @@ export default function App() {
           <HomeOverviewView
             transactions={transactions}
             currency={settings.currency}
-            tursoStatus={tursoStatus}
             onGoToPad={handleGoToPad}
             onGoToReports={() => setActiveTab('reports')}
-            onOpenStudio={() => setShowStudioModal(true)}
           />
         )}
 
@@ -257,21 +263,6 @@ export default function App() {
           />
         )}
       </main>
-
-      {/* Drizzle Studio Table Inspector Modal */}
-      <DrizzleStudioModal
-        isOpen={showStudioModal}
-        onClose={() => setShowStudioModal(false)}
-        transactions={transactions}
-        currency={settings.currency}
-        onClearAll={handleClearAll}
-        onRefresh={() => {
-          checkTursoStatus().then(setTursoStatus);
-          fetchTursoTransactions().then((serverTxs) => {
-            if (serverTxs) updateTransactions(serverTxs);
-          });
-        }}
-      />
 
       {/* Sticky Bottom Navigation Bar */}
       <BottomNav

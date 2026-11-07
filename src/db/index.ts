@@ -1,11 +1,16 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import { createClient } from '@libsql/client';
 import { drizzle } from 'drizzle-orm/libsql';
 import * as schema from './schema';
 
+const fallbackToken =
+  'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3OTQwNzk1NjAsImlkIjoiMDFhMWI3NzktNDkwMS03YTcwLTg2YzAtMTQ0ZjQ4ODg5ZmE1Iiwia2lkIjoiR2xvcVBodDMyWkxJd09LR2tUY3RJMjhHWC1DcDFZT0tqTmpocHN0Y3l1OCIsInJpZCI6ImFjNzJlYjViLTg3MzQtNDAzNy1hZjA3LTI2NTU5NWQxYzZjYSJ9.CdF0MUz0UM8jjGjX_ycRnDZrtiZDDAVcVqFCjHXVlkAmL65b7Zx5x1PJOYLrFtbMDnjs0BKVROqAJEkqQp_aBw';
+
 const tursoUrl =
   process.env.TURSO_DATABASE_URL ||
   'libsql://gestion-de-vicios-maus279555-ui.aws-sa-east-1.turso.io';
-let currentAuthToken = process.env.TURSO_AUTH_TOKEN || '';
+let currentAuthToken = process.env.TURSO_AUTH_TOKEN || fallbackToken;
 
 export let client = createClient({
   url: tursoUrl,
