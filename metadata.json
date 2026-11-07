@@ -1,0 +1,6 @@
+{
+  "name": "Control Diario - Gastos e Ingresos",
+  "description": "Aplicación móvil para registrar gastos diarios e ingresos de venta de gasolina, leña y gastos rápidos con geolocalización y reportes.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
