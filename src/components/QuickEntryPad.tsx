@@ -169,11 +169,10 @@ export const QuickEntryPad: React.FC<QuickEntryPadProps> = ({
             sound.playClick();
             setActiveType('income');
           }}
-          className={`py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all ${
-            activeType === 'income'
+          className={`py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all ${activeType === 'income'
               ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-700/40 ring-1 ring-emerald-400/50'
               : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-          }`}
+            }`}
         >
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
           <span>+ INGRESO (Venta)</span>
@@ -186,11 +185,10 @@ export const QuickEntryPad: React.FC<QuickEntryPadProps> = ({
             sound.playClick();
             setActiveType('expense');
           }}
-          className={`py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all ${
-            activeType === 'expense'
+          className={`py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all ${activeType === 'expense'
               ? 'bg-gradient-to-r from-rose-600 to-amber-700 text-white shadow-lg shadow-rose-700/40 ring-1 ring-rose-400/50'
               : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-          }`}
+            }`}
         >
           <span className="w-2.5 h-2.5 rounded-full bg-rose-400"></span>
           <span>- GASTO DIARIO</span>
@@ -198,7 +196,7 @@ export const QuickEntryPad: React.FC<QuickEntryPadProps> = ({
       </div>
 
       {/* Screen Display for Amount */}
-      <div className="relative bg-gradient-to-b from-slate-900 via-slate-900/95 to-slate-950 border border-slate-800 rounded-2xl p-4 mb-3 shadow-xl">
+      <div className="relative bg-gradient-to-b from-slate-900 via-slate-900/95 to-slate-950 border border-slate-800 rounded-2xl p-2 mb-3 shadow-xl">
         <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
           <span className="flex items-center gap-1 font-medium">
             <Zap className="w-3.5 h-3.5 text-amber-400" />
@@ -229,13 +227,12 @@ export const QuickEntryPad: React.FC<QuickEntryPadProps> = ({
         <div className="flex items-baseline justify-end gap-2 py-1">
           <span className="text-xl font-bold text-slate-400 font-mono">{currency}</span>
           <span
-            className={`text-4xl sm:text-5xl font-extrabold tracking-tight font-mono truncate ${
-              amountStr
+            className={`text-4xl sm:text-5xl font-extrabold tracking-tight font-mono truncate ${amountStr
                 ? activeType === 'income'
                   ? 'text-emerald-400'
                   : 'text-rose-400'
                 : 'text-slate-600'
-            }`}
+              }`}
           >
             {amountStr || '0'}
           </span>

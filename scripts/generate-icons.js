@@ -29,126 +29,189 @@ function createChunk(type, data) {
   return Buffer.concat([len, body, crc]);
 }
 
-function generatePNG(width, height, isMaskable = false) {
-  const signature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+  function generateLeafPNG(width, height, isMaskable = false) {
+    const signature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
 
-  // IHDR
-  const ihdrData = Buffer.alloc(13);
-  ihdrData.writeUInt32BE(width, 0);
-  ihdrData.writeUInt32BE(height, 4);
-  ihdrData.writeUInt8(8, 8); // 8-bit depth
-  ihdrData.writeUInt8(6, 9); // RGBA
-  ihdrData.writeUInt8(0, 10); // compression
-  ihdrData.writeUInt8(0, 11); // filter
-  ihdrData.writeUInt8(0, 12); // interlace
-  const ihdrChunk = createChunk('IHDR', ihdrData);
+    // IHDR
+    const ihdrData = Buffer.alloc(13);
+    ihdrData.writeUInt32BE(width, 0);
+    ihdrData.writeUInt32BE(height, 4);
+    ihdrData.writeUInt8(8, 8); // 8-bit depth
+    ihdrData.writeUInt8(6, 9); // RGBA
+    ihdrData.writeUInt8(0, 10); // compression
+    ihdrData.writeUInt8(0, 11); // filter
+    ihdrData.writeUInt8(0, 12); // interlace
+    const ihdrChunk = createChunk('IHDR', ihdrData);
 
-  // Generate image pixels
-  const rowBytes = width * 4 + 1; // 1 filter byte per row
-  const rawData = Buffer.alloc(rowBytes * height);
+    // Generate image pixels
+    const rowBytes = width * 4 + 1; // 1 filter byte per row
+    const rawData = Buffer.alloc(rowBytes * height);
 
-  const cx = width / 2;
-  const cy = height / 2;
-  const outerR = (width * 0.46);
-  const innerR = (width * 0.38);
-  const centerR = (width * 0.16);
+    for (let y = 0; y < height; y++) {
+      const rowStart = y * rowBytes;
+      rawData[rowStart] = 0; // Filter None
 
-  for (let y = 0; y < height; y++) {
-    const rowStart = y * rowBytes;
-    rawData[rowStart] = 0; // Filter None
+      for (let x = 0; x < width; x++) {
+        const idx = rowStart + 1 + x * 4;
 
-    for (let x = 0; x < width; x++) {
-      const idx = rowStart + 1 + x * 4;
-      const dx = x - cx;
-      const dy = y - cy;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+        // Normalized coordinates [-1, 1]
+        const nx = (x - width / 2) / (width / 2);
+        const ny = (y - height / 2) / (height / 2);
+        const distFromCenter = Math.sqrt(nx * nx + ny * ny);
 
-      // Background color: slate-950 (#0f172a)
-      let r = 15;
-      let g = 23;
-      let b = 42;
-      let a = 255;
+        // Background: Deep forest / obsidian emerald gradient
+        // Darker at corners (#04100c), slightly lighter ambient center (#0d3024)
+        const bgGrad = Math.max(0, 1 - distFromCenter * 0.7);
+        let r = Math.round(5 + bgGrad * 10);
+        let g = Math.round(18 + bgGrad * 28);
+        let b = Math.round(14 + bgGrad * 18);
+        let a = 255;
 
-      if (!isMaskable) {
-        // Rounded corners for non-maskable
-        const cornerR = width * 0.22;
-        const inCornerX = x < cornerR ? cornerR - x : x > width - cornerR ? x - (width - cornerR) : 0;
-        const inCornerY = y < cornerR ? cornerR - y : y > height - cornerR ? y - (height - cornerR) : 0;
-        if (inCornerX > 0 && inCornerY > 0) {
-          const cornerDist = Math.sqrt(inCornerX * inCornerX + inCornerY * inCornerY);
-          if (cornerDist > cornerR) {
-            a = 0;
+        // Squircle rounded corners for non-maskable icons
+        if (!isMaskable) {
+          const cornerR = width * 0.22;
+          const inCornerX = x < cornerR ? cornerR - x : x > width - cornerR ? x - (width - cornerR) : 0;
+          const inCornerY = y < cornerR ? cornerR - y : y > height - cornerR ? y - (height - cornerR) : 0;
+          if (inCornerX > 0 && inCornerY > 0) {
+            const cornerDist = Math.sqrt(inCornerX * inCornerX + inCornerY * inCornerY);
+            if (cornerDist > cornerR) {
+              a = 0;
+            }
           }
         }
-      }
 
-      if (a > 0) {
-        // Emerald / Amber gradient ring
-        if (dist <= outerR && dist >= innerR) {
-          // Angle-based tint
-          const angle = Math.atan2(dy, dx);
-          if (angle < 0) {
-            // Top/right = emerald (#10b981)
-            r = 16;
-            g = 185;
-            b = 129;
-          } else {
-            // Bottom/left = amber (#f59e0b)
-            r = 245;
-            g = 158;
-            b = 11;
+        if (a > 0) {
+              // Ambient soft emerald halo behind the leaf
+              if (distFromCenter < 0.72) {
+                const haloIntensity = Math.pow(1 - distFromCenter / 0.72, 1.8) * 0.35;
+                r = Math.round(r + 16 * haloIntensity);
+                g = Math.round(g + 185 * haloIntensity);
+                b = Math.round(b + 129 * haloIntensity);
+              }
+
+              // Leaf geometry: tilted slightly (-12 deg) for organic feel
+              const angleRad = -0.18; // approx -10.3 degrees
+              const cosA = Math.cos(angleRad);
+              const sinA = Math.sin(angleRad);
+              const lx = nx * cosA - (ny + 0.04) * sinA;
+              const ly = nx * sinA + (ny + 0.04) * cosA;
+
+              // Leaf vertical span: from tip at ly = -0.62 to base at ly = 0.52
+              const tipY = -0.62;
+              const baseY = 0.52;
+              const leafLen = baseY - tipY;
+              const u = (ly - tipY) / leafLen; // 0 at tip, 1 at base
+
+              // Stem stalk below base (u between 0.98 and 1.25)
+              if (u >= 0.98 && u <= 1.22) {
+                const stemCurve = Math.sin((u - 0.98) * 3) * 0.05;
+                const stemDist = Math.abs(lx - stemCurve);
+                if (stemDist <= 0.035) {
+                  // Stem color: deep organic stalk green
+                  r = 5;
+                  g = 150;
+                  b = 105;
+                }
+                }
+
+                // Inside the leaf blade
+                if (u > 0.01 && u < 0.99) {
+                  // Natural coca leaf width envelope W(u)
+                  // Asymmetric bezier-like bell: reaches peak width ~0.42 at u = 0.56
+                  const widthEnv = 3.8 * Math.pow(u, 0.9) * Math.pow(1 - u, 1.2) * 0.44;
+
+                  if (Math.abs(lx) <= widthEnv) {
+                    const isRightSide = lx > 0;
+                    const distFromEdge = widthEnv - Math.abs(lx);
+                    const edgeFade = Math.min(1, distFromEdge * 35); // smooth antialiasing edge
+
+                    // Base leaf blade color
+                    let leafR, leafG, leafB;
+
+                    if (isRightSide) {
+                      // Right side: sunlit vibrant emerald & lime
+                      // #34d399 (52, 211, 153) to #10b981 (16, 185, 129)
+                      const t = lx / widthEnv;
+                      leafR = Math.round(28 + (1 - t) * 24);
+                      leafG = Math.round(195 + (1 - t) * 25);
+                      leafB = Math.round(135 + (1 - t) * 30);
+                    } else {
+                      // Left side: richer, deeper emerald shade
+                      // #059669 (5, 150, 105) to #047857 (4, 120, 87)
+                      const t = Math.abs(lx) / widthEnv;
+                      leafR = Math.round(8 + (1 - t) * 12);
+                      leafG = Math.round(135 + (1 - t) * 35);
+                      leafB = Math.round(95 + (1 - t) * 20);
+                    }
+
+                    // Central main vein (along lx ≈ 0)
+                    const veinDist = Math.abs(lx);
+                    if (veinDist < 0.02) {
+                      const veinT = 1 - veinDist / 0.02;
+                      // Mint glowing vein (#a7f3d0 / #ecfdf5)
+                      leafR = Math.round(leafR + (167 - leafR) * veinT * 0.85);
+                      leafG = Math.round(leafG + (243 - leafG) * veinT * 0.85);
+                      leafB = Math.round(leafB + (208 - leafB) * veinT * 0.85);
+                    }
+
+                    // Lateral secondary veins branching at 45 degrees
+                    const veinPattern = (u * 8 - Math.abs(lx) * 5) % 1.0;
+                    if (veinPattern > 0.88 && veinDist > 0.02 && veinDist < widthEnv * 0.85) {
+                      const veinFade = (veinPattern - 0.88) / 0.12;
+                      leafR = Math.min(255, Math.round(leafR + 40 * veinFade));
+                      leafG = Math.min(255, Math.round(leafG + 55 * veinFade));
+                      leafB = Math.min(255, Math.round(leafB + 45 * veinFade));
+                    }
+
+                    // Morning Dewdrop on the left blade (ly ~ 0.15, lx ~ -0.15)
+                    const dropDx = lx - (-0.14);
+                    const dropDy = ly - 0.12;
+                    const dropDist = Math.sqrt(dropDx * dropDx * 1.5 + dropDy * dropDy);
+                    if (dropDist < 0.045) {
+                      // Dewdrop body: glassy translucent mint
+                      const dropT = 1 - dropDist / 0.045;
+                      leafR = Math.round(leafR + (236 - leafR) * dropT * 0.9);
+                      leafG = Math.round(leafG + (253 - leafG) * dropT * 0.9);
+                      leafB = Math.round(leafB + (245 - leafB) * dropT * 0.9);
+                      // Dewdrop white glint specular highlight
+                      if (Math.abs(dropDx + 0.01) < 0.015 && Math.abs(dropDy + 0.01) < 0.015) {
+                        leafR = 255;
+                        leafG = 255;
+                        leafB = 255;
+                      }
+                    }
+
+                    // Blend leaf with background using edge antialiasing
+                    r = Math.round(r * (1 - edgeFade) + leafR * edgeFade);
+                    g = Math.round(g * (1 - edgeFade) + leafG * edgeFade);
+                    b = Math.round(b * (1 - edgeFade) + leafB * edgeFade);
+                  }
+                }
+              }
+
+              rawData[idx] = Math.min(255, Math.max(0, r));
+              rawData[idx + 1] = Math.min(255, Math.max(0, g));
+              rawData[idx + 2] = Math.min(255, Math.max(0, b));
+              rawData[idx + 3] = a;
+            }
           }
-        } else if (dist < innerR && dist > centerR) {
-          // Inner badge area
-          const vertDist = Math.abs(dx);
-          if (vertDist < width * 0.08 && Math.abs(dy) < height * 0.2) {
-            // Fuel nozzle bar (gold #fbbf24)
-            r = 251;
-            g = 191;
-            b = 36;
-          } else if (dy > 0 && Math.abs(dx) < width * 0.25) {
-            // Emerald wood log pattern
-            r = 5;
-            g = 150;
-            b = 105;
-          }
-        } else if (dist <= centerR) {
-          // Center gold/emerald core
-          r = 16;
-          g = 185;
-          b = 129;
-          if (Math.abs(dx) < centerR * 0.25 || Math.abs(dy) < centerR * 0.25) {
-            // Highlight cross
-            r = 255;
-            g = 255;
-            b = 255;
-          }
+
+          const compressed = zlib.deflateSync(rawData);
+          const idatChunk = createChunk('IDAT', compressed);
+          const iendChunk = createChunk('IEND', Buffer.alloc(0));
+
+          return Buffer.concat([signature, ihdrChunk, idatChunk, iendChunk]);
         }
-      }
 
-      rawData[idx] = r;
-      rawData[idx + 1] = g;
-      rawData[idx + 2] = b;
-      rawData[idx + 3] = a;
-    }
-  }
+        const publicDir = path.resolve('public');
+        if (!fs.existsSync(publicDir)) {
+          fs.mkdirSync(publicDir, { recursive: true });
+        }
 
-  const compressed = zlib.deflateSync(rawData);
-  const idatChunk = createChunk('IDAT', compressed);
-  const iendChunk = createChunk('IEND', Buffer.alloc(0));
+        fs.writeFileSync(path.join(publicDir, 'pwa-192x192.png'), generateLeafPNG(192, 192, false));
+        fs.writeFileSync(path.join(publicDir, 'pwa-512x512.png'), generateLeafPNG(512, 512, false));
+        fs.writeFileSync(path.join(publicDir, 'pwa-maskable-512x512.png'), generateLeafPNG(512, 512, true));
+        fs.writeFileSync(path.join(publicDir, 'apple-touch-icon.png'), generateLeafPNG(180, 180, false));
+        fs.writeFileSync(path.join(publicDir, 'favicon.ico'), generateLeafPNG(64, 64, false));
 
-  return Buffer.concat([signature, ihdrChunk, idatChunk, iendChunk]);
-}
-
-const publicDir = path.resolve('public');
-if (!fs.existsSync(publicDir)) {
-  fs.mkdirSync(publicDir, { recursive: true });
-}
-
-fs.writeFileSync(path.join(publicDir, 'pwa-192x192.png'), generatePNG(192, 192, false));
-fs.writeFileSync(path.join(publicDir, 'pwa-512x512.png'), generatePNG(512, 512, false));
-fs.writeFileSync(path.join(publicDir, 'pwa-maskable-512x512.png'), generatePNG(512, 512, true));
-fs.writeFileSync(path.join(publicDir, 'apple-touch-icon.png'), generatePNG(180, 180, false));
-fs.writeFileSync(path.join(publicDir, 'favicon.ico'), generatePNG(64, 64, false));
-
-console.log('✅ PWA Icons generated successfully in public/');
+        console.log('🍃 Hoja PWA Icons generated successfully in public/');
