@@ -7,6 +7,7 @@ import {
   Cigarette,
   Wine,
   Beer,
+  Fish,
   UtensilsCrossed,
   ShoppingBag,
   CircleDollarSign,
@@ -39,12 +40,15 @@ export const CategoryIcon: React.FC<CategoryIconProps> = ({ id, iconName, classN
     case 'cigarro':
     case 'Cigarette':
       return <Cigarette className={className} {...props} />;
+    case 'trago_cerveza':
     case 'trago':
-    case 'Wine':
-      return <Wine className={className} {...props} />;
     case 'cerveza':
     case 'Beer':
+    case 'Wine':
       return <Beer className={className} {...props} />;
+    case 'pesca':
+    case 'Fish':
+      return <Fish className={className} {...props} />;
     case 'comida':
     case 'UtensilsCrossed':
       return <UtensilsCrossed className={className} {...props} />;

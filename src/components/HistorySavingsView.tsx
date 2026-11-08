@@ -67,7 +67,7 @@ export const HistorySavingsView: React.FC<HistorySavingsViewProps> = ({
       dateMap[t.date].net -= t.amount;
       if (t.category === 'bolo') totalBolo += t.amount;
       if (t.category === 'cigarro') totalCigarro += t.amount;
-      if (['trago', 'cerveza'].includes(t.category)) totalAlcohol += t.amount;
+      if (['trago', 'cerveza', 'trago_cerveza'].includes(t.category)) totalAlcohol += t.amount;
       if (t.category === 'comida') totalComida += t.amount;
     }
   }

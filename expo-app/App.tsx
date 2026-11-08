@@ -25,8 +25,8 @@ export type CategoryId =
   | 'otro_ingreso'
   | 'bolo'
   | 'cigarro'
-  | 'trago'
-  | 'cerveza'
+  | 'trago_cerveza'
+  | 'pesca'
   | 'comida'
   | 'otro_gasto';
 
@@ -56,13 +56,12 @@ const CATEGORIES: Record<
   otro_ingreso: { name: 'Otro Ingreso', type: 'income', icon: 'add-circle', iconFamily: 'ion', color: '#38bdf8', bg: '#082f49' },
   bolo: { name: 'Bolo / Coca', type: 'expense', icon: 'leaf', iconFamily: 'ion', color: '#a3e635', bg: '#1a2e05' },
   cigarro: { name: 'Cigarro', type: 'expense', icon: 'smoking', iconFamily: 'fa', color: '#e2e8f0', bg: '#334155' },
-  trago: { name: 'Trago / Licor', type: 'expense', icon: 'wine', iconFamily: 'ion', color: '#fb7185', bg: '#4c0519' },
-  cerveza: { name: 'Cerveza', type: 'expense', icon: 'beer', iconFamily: 'ion', color: '#facc15', bg: '#422006' },
+  trago_cerveza: { name: 'Trago y Cerveza', type: 'expense', icon: 'beer', iconFamily: 'ion', color: '#facc15', bg: '#422006' },
+  pesca: { name: 'Pesca', type: 'expense', icon: 'fish', iconFamily: 'fa', color: '#38bdf8', bg: '#082f49' },
   comida: { name: 'Comida', type: 'expense', icon: 'utensils', iconFamily: 'fa', color: '#fb923c', bg: '#431407' },
   otro_gasto: { name: 'Otro Gasto', type: 'expense', icon: 'bag-handle', iconFamily: 'ion', color: '#c084fc', bg: '#3b0764' },
 };
 
-const PRESET_AMOUNTS = [10, 20, 50, 100, 150, 200];
 const STORAGE_KEY = '@vicios_transactions_v1';
 
 export default function App() {
@@ -206,7 +205,7 @@ export default function App() {
   const gasIncome = todayTxs.filter((t) => t.category === 'gasolina').reduce((acc, t) => acc + t.amount, 0);
   const woodIncome = todayTxs.filter((t) => t.category === 'leña').reduce((acc, t) => acc + t.amount, 0);
   const vicesExpense = todayTxs
-    .filter((t) => ['bolo', 'cigarro', 'trago', 'cerveza'].includes(t.category))
+    .filter((t) => ['bolo', 'cigarro', 'trago_cerveza', 'trago', 'cerveza'].includes(t.category))
     .reduce((acc, t) => acc + t.amount, 0);
 
   const renderIcon = (catId: CategoryId, size = 22) => {
@@ -420,19 +419,6 @@ export default function App() {
             <View style={styles.displayBox}>
               <Text style={styles.displayCurrency}>$</Text>
               <Text style={styles.displayAmount}>{amountStr}</Text>
-            </View>
-
-            {/* Quick preset amount pills */}
-            <View style={styles.presetRow}>
-              {PRESET_AMOUNTS.map((p) => (
-                <TouchableOpacity
-                  key={p}
-                  style={styles.presetPill}
-                  onPress={() => setAmountStr(p.toString())}
-                >
-                  <Text style={styles.presetText}>+${p}</Text>
-                </TouchableOpacity>
-              ))}
             </View>
 
             {/* Keypad Grid */}

@@ -7,6 +7,7 @@ import {
   Cigarette,
   Wine,
   Beer,
+  Fish,
   UtensilsCrossed,
   ShoppingBag,
   Delete,
@@ -19,7 +20,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { CategoryId, GeoLocationInfo, Transaction, TransactionType } from '../types/finance';
-import { CATEGORIES, PRESET_AMOUNTS } from '../data/categories';
+import { CATEGORIES } from '../data/categories';
 import { sound } from '../services/sound';
 import { triggerHaptic } from '../services/geolocation';
 import { getLocalDateString, getLocalTimeString } from '../services/storage';
@@ -88,14 +89,6 @@ export const QuickEntryPad: React.FC<QuickEntryPadProps> = ({
     sound.playClick();
     setAmountStr('');
     setNote('');
-  };
-
-  const handleQuickAddAmount = (addValue: number) => {
-    triggerHaptic('light');
-    sound.playClick();
-    const current = parseFloat(amountStr) || 0;
-    const newAmount = current + addValue;
-    setAmountStr(newAmount.toString());
   };
 
   // Instant 1-tap category submit
@@ -283,22 +276,6 @@ export const QuickEntryPad: React.FC<QuickEntryPadProps> = ({
         </div>
       </div>
 
-      {/* Quick Amount Pills (+10, +20, +50, +100, +200) */}
-      <div className="flex items-center gap-1.5 mb-3 overflow-x-auto pb-1 no-scrollbar">
-        <span className="text-[10px] font-bold uppercase text-slate-400 px-1 whitespace-nowrap">
-          Rápido:
-        </span>
-        {PRESET_AMOUNTS.map((val) => (
-          <button
-            key={val}
-            onClick={() => handleQuickAddAmount(val)}
-            className="flex-1 min-w-[56px] py-1.5 px-2 bg-slate-800/90 hover:bg-slate-700 active:scale-95 border border-slate-700 rounded-xl text-xs font-bold text-slate-200 hover:text-white transition-all shadow-sm text-center"
-          >
-            +{val}
-          </button>
-        ))}
-      </div>
-
       {/* Primary Category Buttons (1-Tap Registration) */}
       <div className="mb-3">
         <div className="flex items-center justify-between mb-2">
@@ -366,7 +343,7 @@ export const QuickEntryPad: React.FC<QuickEntryPadProps> = ({
             </button>
           </div>
         ) : (
-          /* EXPENSE CATEGORIES */
+          /* EXPENSE CATEGORIES: 6 balanced buttons */
           <div className="grid grid-cols-3 gap-2">
             {/* Bolo / Coca */}
             <button
@@ -392,28 +369,28 @@ export const QuickEntryPad: React.FC<QuickEntryPadProps> = ({
               <span className="text-[10px] text-slate-400">Cajetilla/suelto</span>
             </button>
 
-            {/* Trago */}
+            {/* Trago y Cerveza (Combined) */}
             <button
-              onClick={() => handleSelectCategory('trago')}
-              className="p-2.5 rounded-xl bg-rose-950/40 border border-rose-500/40 hover:border-rose-400 active:scale-95 transition-all text-center flex flex-col items-center shadow group"
-            >
-              <div className="w-9 h-9 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform border border-rose-500/30">
-                <Wine className="w-5 h-5" />
-              </div>
-              <span className="font-bold text-xs text-rose-300">Trago</span>
-              <span className="text-[10px] text-slate-400">Licores</span>
-            </button>
-
-            {/* Cerveza */}
-            <button
-              onClick={() => handleSelectCategory('cerveza')}
+              onClick={() => handleSelectCategory('trago_cerveza')}
               className="p-2.5 rounded-xl bg-amber-950/40 border border-amber-500/40 hover:border-amber-400 active:scale-95 transition-all text-center flex flex-col items-center shadow group"
             >
-              <div className="w-9 h-9 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform border border-amber-500/30">
+              <div className="w-9 h-9 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform border border-amber-500/30">
                 <Beer className="w-5 h-5" />
               </div>
-              <span className="font-bold text-xs text-amber-300">Cerveza</span>
-              <span className="text-[10px] text-slate-400">Botella/lata</span>
+              <span className="font-bold text-xs text-amber-300 truncate max-w-full">Trago y Cerveza</span>
+              <span className="text-[10px] text-slate-400">Bebidas / alcohol</span>
+            </button>
+
+            {/* Pesca (New category) */}
+            <button
+              onClick={() => handleSelectCategory('pesca')}
+              className="p-2.5 rounded-xl bg-cyan-950/40 border border-cyan-500/40 hover:border-cyan-400 active:scale-95 transition-all text-center flex flex-col items-center shadow group"
+            >
+              <div className="w-9 h-9 rounded-lg bg-cyan-500/20 text-cyan-300 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform border border-cyan-500/30">
+                <Fish className="w-5 h-5" />
+              </div>
+              <span className="font-bold text-xs text-cyan-300">Pesca</span>
+              <span className="text-[10px] text-slate-400">Carnada / salida</span>
             </button>
 
             {/* Comida */}

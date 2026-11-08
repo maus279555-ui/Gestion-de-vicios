@@ -158,11 +158,11 @@ export const ReportView: React.FC<ReportViewProps> = ({
         else otherIncome += t.amount;
       } else {
         totalExpense += t.amount;
-        if (['bolo', 'cigarro', 'trago', 'cerveza'].includes(t.category)) {
+        if (['bolo', 'cigarro', 'trago', 'cerveza', 'trago_cerveza'].includes(t.category)) {
           vicesExpense += t.amount;
         }
         if (t.category === 'comida') foodExpense += t.amount;
-        if (t.category === 'otro_gasto') otherExpense += t.amount;
+        if (t.category === 'otro_gasto' || t.category === 'pesca') otherExpense += t.amount;
       }
     }
 

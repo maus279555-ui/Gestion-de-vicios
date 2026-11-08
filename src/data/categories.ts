@@ -56,27 +56,27 @@ export const CATEGORIES: Record<CategoryId, CategoryConfig> = {
     isMain: true,
     description: 'Cajetilla o cigarros sueltos',
   },
-  trago: {
-    id: 'trago',
-    name: 'Trago / Licor',
-    type: 'expense',
-    iconName: 'Wine',
-    color: 'text-rose-400',
-    bgLight: 'bg-rose-500/15 hover:bg-rose-500/25 border-rose-500/30 text-rose-200',
-    borderColor: 'border-rose-500',
-    isMain: true,
-    description: 'Gasto en destilados, singani, alcohol o combinados',
-  },
-  cerveza: {
-    id: 'cerveza',
-    name: 'Cerveza',
+  trago_cerveza: {
+    id: 'trago_cerveza',
+    name: 'Trago y Cerveza',
     type: 'expense',
     iconName: 'Beer',
-    color: 'text-yellow-400',
-    bgLight: 'bg-yellow-500/15 hover:bg-yellow-500/25 border-yellow-500/30 text-yellow-200',
-    borderColor: 'border-yellow-500',
+    color: 'text-amber-400',
+    bgLight: 'bg-amber-500/15 hover:bg-amber-500/25 border-amber-500/30 text-amber-200',
+    borderColor: 'border-amber-500',
     isMain: true,
-    description: 'Botellas, latas o consumo de cerveza',
+    description: 'Bebidas alcohólicas, cervezas, trago o singani',
+  },
+  pesca: {
+    id: 'pesca',
+    name: 'Pesca',
+    type: 'expense',
+    iconName: 'Fish',
+    color: 'text-cyan-400',
+    bgLight: 'bg-cyan-500/15 hover:bg-cyan-500/25 border-cyan-500/30 text-cyan-200',
+    borderColor: 'border-cyan-500',
+    isMain: true,
+    description: 'Gastos de pesca, anzuelos, carnada o implementos',
   },
   comida: {
     id: 'comida',
@@ -100,9 +100,39 @@ export const CATEGORIES: Record<CategoryId, CategoryConfig> = {
     isMain: false,
     description: 'Transporte, imprevistos, compras varias',
   },
+  // Legacy mappings for backwards compatibility with previously saved records
+  trago: {
+    id: 'trago',
+    name: 'Trago / Licor',
+    type: 'expense',
+    iconName: 'Wine',
+    color: 'text-rose-400',
+    bgLight: 'bg-rose-500/15 hover:bg-rose-500/25 border-rose-500/30 text-rose-200',
+    borderColor: 'border-rose-500',
+    isMain: false,
+    description: 'Trago / Licor (registro anterior)',
+  },
+  cerveza: {
+    id: 'cerveza',
+    name: 'Cerveza',
+    type: 'expense',
+    iconName: 'Beer',
+    color: 'text-yellow-400',
+    bgLight: 'bg-yellow-500/15 hover:bg-yellow-500/25 border-yellow-500/30 text-yellow-200',
+    borderColor: 'border-yellow-500',
+    isMain: false,
+    description: 'Cerveza (registro anterior)',
+  },
 };
 
-export const INCOME_CATEGORIES = Object.values(CATEGORIES).filter((c) => c.type === 'income');
-export const EXPENSE_CATEGORIES = Object.values(CATEGORIES).filter((c) => c.type === 'expense');
+export const INCOME_CATEGORIES = [CATEGORIES.gasolina, CATEGORIES.leña, CATEGORIES.otro_ingreso];
+export const EXPENSE_CATEGORIES = [
+  CATEGORIES.bolo,
+  CATEGORIES.cigarro,
+  CATEGORIES.trago_cerveza,
+  CATEGORIES.pesca,
+  CATEGORIES.comida,
+  CATEGORIES.otro_gasto,
+];
 
 export const PRESET_AMOUNTS = [10, 20, 50, 100, 150, 200];

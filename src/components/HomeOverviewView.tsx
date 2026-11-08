@@ -70,7 +70,7 @@ export const HomeOverviewView: React.FC<HomeOverviewViewProps> = ({
       totalExpense += t.amount;
       if (t.category === 'bolo') totalBolo += t.amount;
       else if (t.category === 'cigarro') totalCigarro += t.amount;
-      else if (['trago', 'cerveza'].includes(t.category)) totalAlcohol += t.amount;
+      else if (['trago', 'cerveza', 'trago_cerveza'].includes(t.category)) totalAlcohol += t.amount;
       else if (t.category === 'comida') totalComida += t.amount;
       else totalOtrosGastos += t.amount;
 
@@ -332,7 +332,7 @@ export const HomeOverviewView: React.FC<HomeOverviewViewProps> = ({
                       : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
                   }`}
                 >
-                  {tx.category === 'gasolina' ? '⛽' : tx.category === 'leña' ? '🪵' : tx.category === 'bolo' ? '🍃' : tx.category === 'cigarro' ? '🚬' : tx.category === 'comida' ? '🍲' : '💰'}
+                  {tx.category === 'gasolina' ? '⛽' : tx.category === 'leña' ? '🪵' : tx.category === 'bolo' ? '🍃' : tx.category === 'cigarro' ? '🚬' : tx.category === 'pesca' ? '🎣' : (tx.category === 'trago_cerveza' || tx.category === 'trago' || tx.category === 'cerveza') ? '🍻' : tx.category === 'comida' ? '🍲' : '💰'}
                 </div>
                 <div className="min-w-0">
                   <p className="text-xs font-bold text-white truncate">{tx.categoryName}</p>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Trash2, Save, MapPin, Clock } from 'lucide-react';
 import { CategoryId, Transaction } from '../types/finance';
-import { CATEGORIES } from '../data/categories';
+import { CATEGORIES, INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '../data/categories';
 import { sound } from '../services/sound';
 import { triggerHaptic } from '../services/geolocation';
 
@@ -26,9 +26,8 @@ export const TransactionEditModal: React.FC<TransactionEditModalProps> = ({
   const [date, setDate] = useState<string>(transaction.date);
   const [time, setTime] = useState<string>(transaction.time);
 
-  const availableCategories = Object.values(CATEGORIES).filter(
-    (c) => c.type === transaction.type
-  );
+  const availableCategories =
+    transaction.type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

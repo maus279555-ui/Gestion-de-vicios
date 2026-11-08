@@ -1,7 +1,15 @@
 export type TransactionType = 'income' | 'expense';
 
 export type IncomeCategory = 'gasolina' | 'leña' | 'otro_ingreso';
-export type ExpenseCategory = 'bolo' | 'cigarro' | 'trago' | 'cerveza' | 'comida' | 'otro_gasto';
+export type ExpenseCategory =
+  | 'bolo'
+  | 'cigarro'
+  | 'trago_cerveza'
+  | 'pesca'
+  | 'comida'
+  | 'otro_gasto'
+  | 'trago'
+  | 'cerveza';
 
 export type CategoryId = IncomeCategory | ExpenseCategory;
 

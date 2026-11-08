@@ -103,11 +103,11 @@ export const calculateDailySummary = (dateStr: string, transactions: Transaction
     } else {
       totalExpense += item.amount;
       expenseCount++;
-      if (['bolo', 'cigarro', 'trago', 'cerveza'].includes(item.category)) {
+      if (['bolo', 'cigarro', 'trago', 'cerveza', 'trago_cerveza'].includes(item.category)) {
         vicesExpense += item.amount;
       }
       if (item.category === 'comida') foodExpense += item.amount;
-      if (item.category === 'otro_gasto') otherExpense += item.amount;
+      if (item.category === 'otro_gasto' || item.category === 'pesca') otherExpense += item.amount;
     }
   }
 
