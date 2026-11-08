@@ -3,6 +3,7 @@ import { MapPin, Navigation, Sparkles, RefreshCw, DollarSign, ShieldCheck } from
 import { GeoLocationInfo } from '../types/finance';
 import { sound } from '../services/sound';
 import { triggerHaptic } from '../services/geolocation';
+import { PWAInstallButton } from './PWAInstallButton';
 
 interface MobileHeaderProps {
   currentLocation: GeoLocationInfo | null;
@@ -13,6 +14,7 @@ interface MobileHeaderProps {
   onLoadDemoData: () => void;
   todaySavings: number;
   hasData: boolean;
+  onOpenExpoModal?: () => void;
 }
 
 export const MobileHeader: React.FC<MobileHeaderProps> = ({
@@ -24,6 +26,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
   onLoadDemoData,
   todaySavings,
   hasData,
+  onOpenExpoModal,
 }) => {
   const [timeStr, setTimeStr] = useState('');
   const [dateStr, setDateStr] = useState('');
@@ -82,8 +85,9 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             </div>
           </div>
 
-          {/* Quick Actions (Currency + Demo data + Balance pill) */}
+          {/* Quick Actions (Install PWA / Expo Hub + Currency) */}
           <div className="flex items-center gap-1.5">
+            <PWAInstallButton variant="header" onOpenExpoHub={onOpenExpoModal} />
             <button
               onClick={() => {
                 triggerHaptic('light');

@@ -23,12 +23,14 @@ import { Transaction } from '../types/finance';
 import { triggerHaptic } from '../services/geolocation';
 import { sound } from '../services/sound';
 import { getLocalDateString } from '../services/storage';
+import { PWAInstallButton } from './PWAInstallButton';
 
 interface HomeOverviewViewProps {
   transactions: Transaction[];
   currency: string;
   onGoToPad: (type?: 'income' | 'expense') => void;
   onGoToReports: () => void;
+  onOpenExpoModal?: () => void;
 }
 
 export const HomeOverviewView: React.FC<HomeOverviewViewProps> = ({
@@ -36,6 +38,7 @@ export const HomeOverviewView: React.FC<HomeOverviewViewProps> = ({
   currency,
   onGoToPad,
   onGoToReports,
+  onOpenExpoModal,
 }) => {
   const todayStr = getLocalDateString();
 
@@ -126,6 +129,11 @@ export const HomeOverviewView: React.FC<HomeOverviewViewProps> = ({
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Mobile Install & Expo Go Banner */}
+      <div className="mb-4">
+        <PWAInstallButton variant="card" onOpenExpoHub={onOpenExpoModal} />
       </div>
 
       {/* Resumen Rápido de Hoy */}

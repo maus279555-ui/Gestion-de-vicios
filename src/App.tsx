@@ -37,6 +37,8 @@ import { ReportView } from './components/ReportView';
 import { HistorySavingsView } from './components/HistorySavingsView';
 import { SettingsView } from './components/SettingsView';
 import { clearAllTursoTransactions } from './services/api';
+import { ExpoGoModal } from './components/ExpoGoModal';
+import { OfflineIndicator } from './components/OfflineIndicator';
 
 export default function App() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -47,6 +49,7 @@ export default function App() {
   const [isLocating, setIsLocating] = useState<boolean>(true);
   const [tursoStatus, setTursoStatus] = useState<TursoStatus | null>(null);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const [isExpoModalOpen, setIsExpoModalOpen] = useState<boolean>(false);
 
   // Initialize data on mount - clean slate, NO fictitious data
   useEffect(() => {
@@ -212,6 +215,7 @@ export default function App() {
         onLoadDemoData={handleLoadDemoData}
         todaySavings={todaySummary.netSavings}
         hasData={transactions.length > 0}
+        onOpenExpoModal={() => setIsExpoModalOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -222,6 +226,7 @@ export default function App() {
             currency={settings.currency}
             onGoToPad={handleGoToPad}
             onGoToReports={() => setActiveTab('reports')}
+            onOpenExpoModal={() => setIsExpoModalOpen(true)}
           />
         )}
 
@@ -260,9 +265,19 @@ export default function App() {
             tursoStatus={tursoStatus}
             onSyncTurso={handleSyncTurso}
             isSyncing={isSyncing}
+            onOpenExpoModal={() => setIsExpoModalOpen(true)}
           />
         )}
       </main>
+
+      {/* Offline Mode Alert */}
+      <OfflineIndicator />
+
+      {/* Expo Go & Mobile Code Hub Modal */}
+      <ExpoGoModal
+        isOpen={isExpoModalOpen}
+        onClose={() => setIsExpoModalOpen(false)}
+      />
 
       {/* Sticky Bottom Navigation Bar */}
       <BottomNav

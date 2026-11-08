@@ -18,6 +18,7 @@ import { sound } from '../services/sound';
 import { triggerHaptic } from '../services/geolocation';
 
 import { TursoStatus, updateServerTursoToken } from '../services/api';
+import { PWAInstallButton } from './PWAInstallButton';
 
 interface SettingsViewProps {
   settings: AppSettings;
@@ -26,6 +27,7 @@ interface SettingsViewProps {
   tursoStatus: TursoStatus | null;
   onSyncTurso: () => void;
   isSyncing: boolean;
+  onOpenExpoModal?: () => void;
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({
@@ -35,6 +37,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   tursoStatus,
   onSyncTurso,
   isSyncing,
+  onOpenExpoModal,
 }) => {
   const [tokenInput, setTokenInput] = React.useState('');
   const [isSavingToken, setIsSavingToken] = React.useState(false);
@@ -83,6 +86,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         <p className="text-xs text-slate-400">
           Personaliza la moneda, sonidos, vibración táctil y consulta cómo usar la app.
         </p>
+      </div>
+
+      {/* Instalar App & Expo Hub */}
+      <div className="mb-4">
+        <PWAInstallButton variant="settings" onOpenExpoHub={onOpenExpoModal} />
       </div>
 
       {/* Moneda y Preferencias */}
